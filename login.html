@@ -107,12 +107,10 @@
   .error{color:#d04444}
   .success{color:#0b9b76}
 
-  /* small screens */
   @media (max-width:420px){
     .card{width:92%}
   }
 
-  /* extra style for otp input */
   .otp-row{display:flex;gap:6px;justify-content:center;margin-top:8px}
   .otp-row input{width:44px;text-align:center;font-size:18px;padding:10px}
 </style>
@@ -151,16 +149,12 @@
       <label>رقم الجوال (مثال: +9665xxxxxxxx)</label>
       <input id="phone" type="tel" placeholder="+9665xxxxxxxx" />
     </div>
-
-    <!-- reCAPTCHA container (invisible) -->
     <div id="recaptcha-container"></div>
-
     <div class="row" style="margin-top:6px">
       <button class="btn btn-primary" onclick="sendOTP()">أرسل رمز التحقق</button>
       <button class="btn btn-ghost" onclick="clearPhone()">مسح</button>
     </div>
 
-    <!-- رمز OTP -->
     <div id="otp-section" style="display:none;margin-top:10px">
       <label>أدخل رمز التحقق (SMS):</label>
       <div style="display:flex;gap:8px;margin:8px 0">
@@ -177,176 +171,125 @@
   <div class="muted">باستخدام تسجيل الدخول توافق على سياسة الاستخدام</div>
 </div>
 
-<!-- Firebase compat SDKs (نستخدم نسخ compat لسهولة استدعاء firebase.auth()) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- Firebase Modular SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
 
-<script>
-  // --- ضع هنا إعدادات Firebase الخاصة بك ---
+  // ⚠️ تحذير: مفاتيح العميل فقط، لا تضع مفاتيح Admin
   const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyC5HTAq-LeJn4GObn08REwKdqIeokKmwds",
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "smart-hsr.firebaseapp.com",
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "smart-hsr",
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "smart-hsr.firebasestorage.app",
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "885545362431",
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:885545362431:web:2487096393f0fcbf29bdca",
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-NH7J83MWT9"
   };
 
-  // تهيئة Firebase
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.firestore();
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-  // عناصر واجهة
-  const emailBox = document.getElementById('email-box');
-  const phoneBox = document.getElementById('phone-box');
-  const msgEl = document.getElementById('msg');
-
-  // تبديل الوضع
-  document.getElementById('mode-email').addEventListener('click', () => {
-    emailBox.style.display = 'block';
-    phoneBox.style.display = 'none';
-    msg('');
-  });
-  document.getElementById('mode-phone').addEventListener('click', () => {
-    emailBox.style.display = 'none';
-    phoneBox.style.display = 'block';
-    msg('');
-  });
-
-  // دوال عرض رسالة
-  function msg(text, type) {
-    msgEl.innerText = text || '';
-    msgEl.className = 'message ' + (type || '');
-  }
-
-  // === EMAIL AUTH ===
-  function signupWithEmail(){
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    if(!email || !password){ msg('أدخل الايميل وكلمة المرور', 'error'); return; }
-
-    auth.createUserWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        // حفظ بيانات المستخدم في Firestore
-        db.collection('users').doc(user.uid).set({
-          email: user.email,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          provider: 'email'
-        });
-        msg('تم إنشاء الحساب بنجاح', 'success');
-      })
-      .catch((err) => { msg(err.message, 'error'); });
-  }
-
-  function signInWithEmail(){
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    if(!email || !password){ msg('أدخل الايميل وكلمة المرور', 'error'); return; }
-
-    auth.signInWithEmailAndPassword(email, password)
-      .then((userCredential)=>{
-        msg('تم تسجيل الدخول بنجاح', 'success');
-        // توجيه أو فتح لوحة القيادة
-        // window.location.href = 'dashboard.html';
-      })
-      .catch((err)=>{ msg(err.message, 'error'); });
-  }
-
-  // === PHONE AUTH (OTP) ===
-  // إعداد reCAPTCHA (invisible)
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    'size': 'invisible',
-    'callback': (response) => {
-      // reCAPTCHA succeeded
-    }
-  });
+  // إعداد reCAPTCHA
+  window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', { size: 'invisible' }, auth);
 
   let confirmationResultGlobal = null;
   let lastPhoneUsed = '';
 
-  function sendOTP(){
+  // --- دوال تسجيل الدخول بالإيميل ---
+  async function signupWithEmail() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if(!email || !password){ msg('أدخل الايميل وكلمة المرور', 'error'); return; }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await setDoc(doc(db, 'users', userCredential.user.uid), {
+        email: userCredential.user.email,
+        provider: 'email',
+        createdAt: serverTimestamp()
+      });
+      msg('تم إنشاء الحساب بنجاح', 'success');
+    } catch(err) { msg(err.message, 'error'); }
+  }
+
+  async function signInWithEmail() {
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    if(!email || !password){ msg('أدخل الايميل وكلمة المرور', 'error'); return; }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      msg('تم تسجيل الدخول بنجاح', 'success');
+    } catch(err) { msg(err.message, 'error'); }
+  }
+
+  // --- دوال تسجيل الدخول بالهاتف (OTP) ---
+  async function sendOTP() {
     const phone = document.getElementById('phone').value.trim();
     if(!phone){ msg('أدخل رقم الجوال بصيغة دولية مثل +9665xxxxxxx', 'error'); return; }
-
     msg('جاري إرسال رمز التحقق...', '');
-    const appVerifier = window.recaptchaVerifier;
-    // إرسال OTP
-    auth.signInWithPhoneNumber(phone, appVerifier)
-      .then((confirmationResult) => {
-        confirmationResultGlobal = confirmationResult;
-        lastPhoneUsed = phone;
-        msg('تم إرسال رمز التحقق. أدخله في الحقل واعمل تحقق.', 'success');
-        document.getElementById('otp-section').style.display = 'block';
-      })
-      .catch((error) => {
-        // إن فشل، من الممكن أن تكون reCAPTCHA غير مهيّأة بشكل صحيح أو رقم غير صحيح
-        msg(error.message || 'خطأ في إرسال الرمز', 'error');
-        // إعادة تهيئة reCAPTCHA لفرص جديدة
-        window.recaptchaVerifier.render().then(widgetId => {
-          grecaptcha.reset(widgetId);
-        }).catch(()=>{});
-      });
+    try {
+      confirmationResultGlobal = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
+      lastPhoneUsed = phone;
+      msg('تم إرسال رمز التحقق. أدخله في الحقل واعمل تحقق.', 'success');
+      document.getElementById('otp-section').style.display = 'block';
+    } catch(err) {
+      msg(err.message || 'خطأ في إرسال الرمز', 'error');
+      window.recaptchaVerifier.render().then(widgetId => grecaptcha.reset(widgetId)).catch(()=>{});
+    }
   }
 
-  function verifyOTP(){
+  async function verifyOTP() {
     const code = document.getElementById('otp-code').value.trim();
-    if(!code || !confirmationResultGlobal){ msg('أدخل رمز التحقق أولاً ثم اضغط تحقق', 'error'); return; }
-
-    confirmationResultGlobal.confirm(code)
-      .then((result) => {
-        const user = result.user;
-        // حفظ المستخدم في Firestore إن لم يكن موجود
-        db.collection('users').doc(user.uid).set({
-          phone: user.phoneNumber,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-          provider: 'phone'
-        }, { merge: true });
-
-        msg('تم التحقق وتسجيل الدخول بنجاح', 'success');
-        // يمكنك إعادة توجيه المستخدم الآن
-        // window.location.href = 'dashboard.html';
-      })
-      .catch((err) => {
-        msg(err.message || 'رمز غير صحيح', 'error');
-      });
+    if(!code || !confirmationResultGlobal){ msg('أدخل رمز التحقق أولاً', 'error'); return; }
+    try {
+      const result = await confirmationResultGlobal.confirm(code);
+      await setDoc(doc(db, 'users', result.user.uid), {
+        phone: result.user.phoneNumber,
+        provider: 'phone',
+        createdAt: serverTimestamp()
+      }, { merge: true });
+      msg('تم التحقق وتسجيل الدخول بنجاح', 'success');
+    } catch(err) { msg(err.message || 'رمز غير صحيح', 'error'); }
   }
 
-  function resendOTP(){
-    // لإعادة الإرسال نهيئ reCAPTCHA من جديد ثم نرسل على آخر هاتف
+  function resendOTP() {
     if(!lastPhoneUsed){ msg('أرسل رقم الجوال أولاً', 'error'); return; }
-    // reset recaptcha
     window.recaptchaVerifier.clear();
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', { 'size': 'invisible' });
-    msg('جاري إعادة الإرسال...', '');
-    auth.signInWithPhoneNumber(lastPhoneUsed, window.recaptchaVerifier)
-      .then((confirmationResult) => {
-        confirmationResultGlobal = confirmationResult;
-        msg('أُعيد إرسال رمز التحقق', 'success');
-      }).catch((err)=>{
-        msg(err.message || 'فشل إعادة الإرسال', 'error');
-      });
+    window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', { size: 'invisible' }, auth);
+    sendOTP();
   }
 
-  function clearPhone(){
+  function clearPhone() {
     document.getElementById('phone').value = '';
     document.getElementById('otp-code').value = '';
     document.getElementById('otp-section').style.display = 'none';
     msg('');
   }
 
-  // استماع لتغير حالة الدخول (اختياري)
-  auth.onAuthStateChanged((user)=>{
-    if(user){
-      console.log('المستخدم الحالي:', user);
-      // مثال: لو أردت إعادة التوجيه التلقائي
-      // window.location.href = 'dashboard.html';
-    } else {
-      // لا أحد مسجل دخول حالياً
-    }
+  function msg(text, type) {
+    const msgEl = document.getElementById('msg');
+    msgEl.innerText = text || '';
+    msgEl.className = 'message ' + (type || '');
+  }
+
+  auth.onAuthStateChanged(user => {
+    if(user){ console.log('المستخدم الحالي:', user); }
   });
+
+  // --- تبديل الأوضاع ---
+  document.getElementById('mode-email').addEventListener('click', () => {
+    document.getElementById('email-box').style.display = 'block';
+    document.getElementById('phone-box').style.display = 'none';
+    msg('');
+  });
+  document.getElementById('mode-phone').addEventListener('click', () => {
+    document.getElementById('email-box').style.display = 'none';
+    document.getElementById('phone-box').style.display = 'block';
+    msg('');
+  });
+
 </script>
 </body>
 </html>
