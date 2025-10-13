@@ -10,35 +10,35 @@
     <style>
         /* الألوان: مستوحاة من هويتك (Teal/Navy) */
         :root{
-            --primary-teal:#0ea5a1; /* Teal 500 */
-            --secondary-navy:#0b2b3a; /* Dark Navy */
-            --card-bg:#ffffff;
-            --button-shadow: rgba(14, 165, 161, 0.4);
+            --primary-teal:#0ea5a1; /* Teal 500 [cite: 1, 2] */
+            --secondary-navy:#0b2b3a; /* Dark Navy [cite: 2] */
+            --card-bg:#ffffff; /* [cite: 3] */
+            --button-shadow: rgba(14, 165, 161, 0.4); [cite: 4]
         }
         *{box-sizing:border-box}
         body{
             margin:0;
-            font-family:'Tajawal', sans-serif; /* استخدام خط عربي حديث */
-            background:linear-gradient(180deg,#f7f9fb 0%,#f0f2f5 100%);
-            min-height:100vh;
+            font-family:'Tajawal', sans-serif; /* استخدام خط عربي حديث [cite: 5] */
+            background:linear-gradient(180deg,#f7f9fb 0%,#f0f2f5 100%); [cite: 5]
+            min-height:100vh; [cite: 6]
             display:flex;
             align-items:center;
             justify-content:center;
             padding:30px;
         }
         .card{
-            width:380px;
-            background:var(--card-bg);
+            width:380px; [cite: 7]
+            background:var(--card-bg); [cite: 7]
             border-radius:24px; /* زوايا أكثر استدارة وفخامة */
-            box-shadow:0 15px 40px rgba(10,20,50,0.15); /* ظل احترافي */
-            padding:40px 30px;
-            border: 1px solid #e9ecef; /* خط خفيف حول البطاقة */
+            box-shadow:0 15px 40px rgba(10,20,50,0.15); /* ظل احترافي [cite: 8] */
+            padding:40px 30px; [cite: 8]
+            border: 1px solid #e9ecef; /* خط خفيف حول البطاقة [cite: 9] */
             position:relative;
-            overflow:hidden;
+            overflow:hidden; [cite: 10]
             transition: all 0.3s ease;
         }
         .card:hover{
-             box-shadow:0 18px 45px rgba(14, 165, 161, 0.2);
+             box-shadow:0 18px 45px rgba(14, 165, 161, 0.2); [cite: 11]
         }
         
         h1{margin:0 0 4px 0;text-align:center;font-size:32px;color:var(--secondary-navy);font-weight:900;}
@@ -46,35 +46,35 @@
         
         /* شريط التمييز العلوي (هوية الشركات الكبرى) */
         .card-header-line{
-            position: absolute;
-            top: 0;
+            position: absolute; [cite: 12]
+            top: 0; [cite: 12]
             left: 0;
             right: 0;
             height: 5px;
             background: linear-gradient(90deg, var(--primary-teal), var(--secondary-navy));
             border-top-left-radius: 24px;
-            border-top-right-radius: 24px;
+            border-top-right-radius: 24px; [cite: 13]
         }
 
         .field{margin-bottom:18px}.field label{display:block;margin-bottom:8px;color:var(--secondary-navy);font-size:14px;font-weight:600;}
         input[type="email"],input[type="password"]{
-            width:100%;
-            padding:14px 18px;
+            width:100%; [cite: 14]
+            padding:14px 18px; [cite: 14]
             border-radius:12px;
             border:1px solid #d4dce4;
             background:#f8f9fa;
             font-size:16px;
             outline:none;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            transition: border-color 0.3s, box-shadow 0.3s; [cite: 15]
         }
         input:focus{
-            border-color:var(--primary-teal);
-            box-shadow:0 0 0 3px rgba(14, 165, 161, 0.1);
+            border-color:var(--primary-teal); [cite: 16]
+            box-shadow:0 0 0 3px rgba(14, 165, 161, 0.1); [cite: 16]
             background:white;
         }
         .btn{
-            width:100%;
-            padding:14px;
+            width:100%; [cite: 17]
+            padding:14px; [cite: 17]
             border-radius:12px;
             border:none;
             cursor:pointer;
@@ -83,16 +83,16 @@
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: center; [cite: 18]
         }
         .btn-primary{
-            background:linear-gradient(90deg, var(--primary-teal), #0b7285);
-            color:white;
+            background:linear-gradient(90deg, var(--primary-teal), #0b7285); [cite: 19]
+            color:white; [cite: 19]
             box-shadow:0 10px 20px var(--button-shadow);
         }
         .btn-primary:hover:not(:disabled){
-            transform: translateY(-2px);
-            box-shadow:0 12px 25px var(--button-shadow);
+            transform: translateY(-2px); [cite: 20]
+            box-shadow:0 12px 25px var(--button-shadow); [cite: 20]
             background:linear-gradient(90deg, #0b7285, var(--primary-teal));
         }
         .message{text-align:center;margin-top:15px;font-weight:600;font-size:15px;}
@@ -101,18 +101,20 @@
         .muted{font-size:13px;color:#7b8a90;text-align:center;margin-top:15px;}
         
         .loading-spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
+            border: 3px solid rgba(255, 255, 255, 0.3); [cite: 21]
+            border-top: 3px solid white; [cite: 21]
             border-radius: 50%;
             width: 20px;
             height: 20px;
             animation: spin 1s linear infinite;
-            margin-left: 10px;
+            margin-left: 10px; [cite: 22]
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% { transform: rotate(0deg); [cite: 23]
+            }
+            100% { transform: rotate(360deg); [cite: 24]
+            }
         }
         @media (max-width:420px){.card{width:95%;padding:30px 20px;}}
     </style>
@@ -132,7 +134,8 @@
     <div class="field">
       <label for="password">كلمة المرور:</label>
       <input id="password" type="password" placeholder="كلمة المرور السرية" required />
-    </div>
+  
+    </div> [cite: 25]
     
     <button type="submit" id="loginButton" class="btn btn-primary" style="margin-top:10px;">
         تسجيل الدخول
@@ -144,8 +147,8 @@
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"; [cite: 26]
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"; [cite: 26]
 
 // هذا هو نفس إعداد مشروعك Firebase
 const firebaseConfig = {
@@ -157,52 +160,48 @@ const firebaseConfig = {
   appId: "1:885545362431:web:2487096393f0fcbf29bdca",
   measurementId: "G-NH7J83MWT9" // يمكن إزالته إذا لم تستخدم إحصائيات جوجل
 };
-
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig); [cite: 27]
 const auth = getAuth(app);
-const loginButton = document.getElementById('loginButton');
-
+const loginButton = document.getElementById('loginButton'); [cite: 28]
 function msg(t, type) {
     const el = document.getElementById('msg');
     el.innerText = t || '';
-    el.className = 'message ' + (type || '');
+    el.className = 'message ' + (type || ''); [cite: 29]
 }
 
 window.signInWithEmail = async function () {
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
+    const email = document.getElementById('email').value.trim(); [cite: 30]
+    const password = document.getElementById('password').value; [cite: 30]
     
     if (!email || !password) {
-        msg('أدخل البريد الإلكتروني وكلمة المرور أولاً.','error');
-        return;
+        msg('أدخل البريد الإلكتروني وكلمة المرور أولاً.','error'); [cite: 31]
+        return; [cite: 31]
     }
     
     // وضع زر التحميل
-    loginButton.disabled = true;
-    loginButton.innerHTML = `<div class="loading-spinner"></div> جاري الدخول...`;
+    loginButton.disabled = true; [cite: 32]
+    loginButton.innerHTML = `<div class="loading-spinner"></div> جاري الدخول...`; [cite: 32]
 
     try {
-        await signInWithEmailAndPassword(auth, email, password);
-        msg('تم تسجيل الدخول بنجاح. جاري التوجيه...','success');
+        await signInWithEmailAndPassword(auth, email, password); [cite: 33]
+        msg('تم تسجيل الدخول بنجاح. جاري التوجيه...','success'); [cite: 33]
         
         // التوجيه إلى صفحة لوحة القيادة
-        window.location.href="index.html"; 
+        window.location.href="dashboard.html"; // تم التعديل هنا: التوجيه لصفحة لوحة القيادة dashboard.html
     } catch(e) {
-        let errorMessage = 'خطأ في تسجيل الدخول. تأكد من البريد وكلمة المرور.';
+        let errorMessage = 'خطأ في تسجيل الدخول. تأكد من البريد وكلمة المرور.'; [cite: 35]
         if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password') {
-             errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.';
+             errorMessage = 'البريد الإلكتروني أو كلمة المرور غير صحيحة.'; [cite: 36]
         } else if (e.code === 'auth/too-many-requests') {
-             errorMessage = 'تم حظر الحساب مؤقتاً بسبب محاولات كثيرة فاشلة.';
+             errorMessage = 'تم حظر الحساب مؤقتاً بسبب محاولات كثيرة فاشلة.'; [cite: 37]
         }
         
-        msg(errorMessage, 'error');
-        
+        msg(errorMessage, 'error'); [cite: 38]
         // إعادة تفعيل الزر
-        loginButton.disabled = false;
-        loginButton.innerHTML = `تسجيل الدخول`;
+        loginButton.disabled = false; [cite: 38]
+        loginButton.innerHTML = `تسجيل الدخول`; [cite: 38]
     }
 }
 </script>
 </body>
 </html>
-
