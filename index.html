@@ -974,13 +974,29 @@ async function uploadImageBase64(file) {
     // =============================
     // 8) بدء التشغيل
     // =============================
-    async function initApp(){
-      try {
-        await loadFromFirestore();
-      } catch (e) {
-        console.warn('Loading from Firestore failed, fallback to local demo.', e);
-        seedLocalDemo();
-      }
+  async function initApp(){
+  try {
+    await loadFromFirestore();
+
+    if (!observationsData || observationsData.length === 0) {
+      console.warn("⚠️ لا توجد بيانات في Firestore - سيتم استخدام النسخ المحلية فقط (بدون حذف الصور).");
+      // لا نستدعي seedLocalDemo هنا
+    }
+
+  } catch (e) {
+    console.error("❌ فشل تحميل البيانات من Firestore:", e);
+    alert("تعذر الاتصال بقاعدة البيانات، سيتم عرض البيانات الأخيرة المخزنة محلياً فقط.");
+    // لا نستدعي seedLocalDemo() حتى لا نحذف الصور
+  }
+
+  // عرض الواجهة فقط
+  renderKPIs();
+  observationsData.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+  renderObservationsList(observationsData);
+  if (observationsData.length>0) showObservationDetail(observationsData[0].docId);
+  lucide.createIcons();
+}
+
       // عرض
       renderKPIs();
       observationsData.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
