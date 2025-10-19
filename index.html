@@ -95,41 +95,6 @@
 </head>
 
 <body class="text-gray-800">
-  <!-- حماية تسجيل الدخول بالبريد الإلكتروني -->
-  <script type="module">
-    import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBfClVxFIXgUXL4olEv5SepUDtzk0dq3lo",
-      authDomain: "gen-lang-client-0349944917.firebaseapp.com",
-      projectId: "gen-lang-client-0349944917",
-      storageBucket: "gen-lang-client-0349944917.appspot.com",
-      messagingSenderId: "883065484771",
-      appId: "1:883065484771:web:c907bb5a51f68caad75cd6"
-    };
-
-    // ✅ استخدم التطبيق الموجود إذا تم تهيئته مسبقاً
-    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // 🔍 تحقق من حالة المستخدم
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        // 🚫 المستخدم غير مسجل → يرجع لصفحة login.html
-        window.location.href = "login.html";
-      } else {
-        console.log("✅ المستخدم الحالي:", user.email);
-      }
-    });
-
-    // 🔓 تسجيل الخروج
-    window.smartLogout = function() {
-      signOut(auth).then(() => {
-        window.location.href = "login.html";
-      });
-    };
-  </script>
 
   <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <div class="flex justify-start mb-6 no-print">
@@ -937,6 +902,15 @@ async function uploadImageBase64(file) {
         </div>`);
     };
 
+    window.generatePdfReport = function(){ window.print(); };
+
+    window.smartLogout = function(){
+      const button = document.getElementById('logout-btn');
+      button.disabled = true;
+      button.innerHTML = '<div class="loading-spinner" style="border-top:4px solid var(--color-teal);"></div> جاري تسجيل الخروج...';
+      button.classList.add('flex-row-reverse','justify-center'); button.style.backgroundColor='gray';
+      setTimeout(()=>{ alert('تم تسجيل الخروج.'); window.location.href='login.html'; }, 800);
+    };
 
     // =============================
     // 7) أدوات مساعدة UI
@@ -962,33 +936,26 @@ async function uploadImageBase64(file) {
       ].sort((a,b)=>b.createdAt-a.createdAt);
     }
 
-// =============================
-// 8) بدء التشغيل
-// =============================
-async function initApp(){
-  try {
-    await loadFromFirestore();
-
-    if (!observationsData || observationsData.length === 0) {
-      console.warn("⚠️ لا توجد بيانات في Firestore - سيتم استخدام النسخ المحلية فقط (بدون حذف الصور).");
-      // لا نستدعي seedLocalDemo هنا حتى لا نحذف الصور القديمة
+    // =============================
+    // 8) بدء التشغيل
+    // =============================
+    async function initApp(){
+      try {
+        await loadFromFirestore();
+      } catch (e) {
+        console.warn('Loading from Firestore failed, fallback to local demo.', e);
+        seedLocalDemo();
+      }
+      // عرض
+      renderKPIs();
+      observationsData.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
+      renderObservationsList(observationsData);
+      if (observationsData.length>0) showObservationDetail(observationsData[0].docId);
+      lucide.createIcons();
     }
+    window.onload = initApp;
 
-  } catch (e) {
-    console.error("❌ فشل تحميل البيانات من Firestore:", e);
-    alert("تعذر الاتصال بقاعدة البيانات، سيتم عرض البيانات الأخيرة المخزنة محلياً فقط.");
-  }
-
-  // عرض واجهة المستخدم
-  renderKPIs();
-  observationsData.sort((a,b)=> (b.createdAt||0)-(a.createdAt||0));
-  renderObservationsList(observationsData);
-  if (observationsData.length>0) showObservationDetail(observationsData[0].docId);
-  lucide.createIcons();
-}
-
-window.onload = initApp;
-
+        window.onload = initApp;
 
 // =============================
 // أداة مساعدة لتغيير حالة الأزرار أثناء التحميل
