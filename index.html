@@ -953,6 +953,34 @@ async function uploadImageBase64(file) {
       lucide.createIcons();
     }
     window.onload = initApp;
+
+        window.onload = initApp;
+
+// =============================
+// أداة مساعدة لتغيير حالة الأزرار أثناء التحميل
+// =============================
+function setButtonBusy(buttonId, busy) {
+  const btn = document.getElementById(buttonId);
+  if (!btn) return;
+  if (busy) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <div class="loading-spinner" 
+           style="border-top:4px solid var(--color-teal);
+                  width:20px;height:20px;
+                  margin-inline-end:8px;"></div> جاري المعالجة...`;
+    btn.classList.add('flex','items-center','justify-center','gap-2');
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = 'تأكيد الإغلاق';
+    btn.classList.remove('flex','items-center','justify-center','gap-2');
+  }
+}
+
+  </script>
+</body>
+</html>
+
   </script>
 </body>
 </html>
