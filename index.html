@@ -446,19 +446,6 @@ try {
   document.getElementById('userInfo').textContent = '⚠️ وضع تجريبي محلي (لم يتم ضبط Firebase).';
 }
 
-
-    let app, db, FIREBASE_READY = false;
-
-    try {
-      app = initializeApp(firebaseConfig);
-      db = getFirestore(app);
-      FIREBASE_READY = !!db;
-      document.getElementById('userInfo').textContent = 'متصل بـ Firebase / Firestore.';
-    } catch (e) {
-      console.warn('Firebase init failed, fallback to local demo mode.', e);
-      document.getElementById('userInfo').textContent = 'وضع تجريبي محلي (لم يتم ضبط Firebase).';
-    }
-
     // =============================
     // 2) حالة واجهة المستخدم + بيانات
     // =============================
